@@ -77,13 +77,6 @@ analysisDir() {
 			continue
 		fi
 
-		fileSize=`ls -l "$line" | awk '{print $5}'`
-		# # 小于2K的文件不统计
-		# MinCheckFileSize=(1024*2)
-		# if [[ $fileSize -lt MinCheckFileSize ]]; then
-		# 	continue
-		# fi
-
 		ls -l "$line" | awk '{printf "%-12s %s%s%s\n", $5, $9, $10, $11}' >> $fileSizeResultFile
 
 	done < $traverseResultFile
@@ -91,7 +84,7 @@ analysisDir() {
 	echo "文件大小（字节）| 绝对路径"
 
 	# 默认只输出最大的60个文件
-	sort -nr -k 1 -t ' ' $fileSizeResultFile | awk '{if(NR < 60){print $0}}'
+	sort -nr -k 1 -t ' ' $fileSizeResultFile | awk '{if(NR <= 60){print $0}}'
 
 	rm -f $traverseResultFile
 	rm -f $fileSizeResultFile
