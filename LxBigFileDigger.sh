@@ -55,14 +55,15 @@ analysisDir() {
 	echo "============  正在分析...... ============"
 
 	dir=$1
+	filterType=$2
 
 	cd "$dir"
 
-	traverseResultFile="__traverseResultFile__"
-	fileSizeResultFile="__fileSizeResultFile__"
+	traverseResultFile="$HOME/Desktop/__traverseResultFile__"
+	fileSizeResultFile="$HOME/Desktop/__fileSizeResultFile__"
 
-	rm -f $traverseResultFile
-	rm -f $fileSizeResultFile
+	touch $traverseResultFile
+	touch $fileSizeResultFile
 
 	find `pwd` > $traverseResultFile
 
@@ -77,7 +78,19 @@ analysisDir() {
 			continue
 		fi
 
-		ls -l "$line" | awk '{printf "%-12s %s%s%s\n", $5, $9, $10, $11}' >> $fileSizeResultFile
+		if [[ $filterType == 0 ]]; then
+			ls -l "$line" | awk '{printf "%-12s %s%s%s\n", $5, $9, $10, $11}' >> $fileSizeResultFile
+		elif [[ $filterType == 1 ]]; then
+			isOCFile $line	
+			if [[ $? == 1 ]]; then
+				ls -l "$line" | awk '{printf "%-12s %s%s%s\n", $5, $9, $10, $11}' >> $fileSizeResultFile
+			fi
+		elif [[ $filterType == 2 ]]; then
+			isImageFile $line	
+			if [[ $? == 1 ]]; then
+				ls -l "$line" | awk '{printf "%-12s %s%s%s\n", $5, $9, $10, $11}' >> $fileSizeResultFile
+			fi
+		fi
 
 	done < $traverseResultFile
 
@@ -94,7 +107,8 @@ getFilepath() {
 	read -p "👉  输入需要检查的目录：" filepath
 	judgeFilepath $filepath
 	case $? in
-		0) 	analysisDir $filepath
+		0) 	getFilterType $filepath
+			analysisDir $filepath $filterType
 		;;
 		*) echo 【请输入正确的目录路径！】
 			getFilepath
