@@ -18,6 +18,8 @@ isOCFile() {
 		return 1
 	elif [[ ${filepath:0-2:2} = '.m' ]]; then
 		return 1
+	elif [[ ${filepath:0-3:3} = '.mm' ]]; then
+		return 1
 	else
 		return 0
 	fi
